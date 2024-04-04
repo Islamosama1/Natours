@@ -10,7 +10,7 @@
     "watch:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.1.js --public-url ./",
     "build:js": "parcel build ./public/js/index.js --out-dir ./public/js --out-file bundle.1.js --public-url ./"
   },
-  "author": "IO",
+  "author": "Islam Osama",
   "license": "ISC",
   "dependencies": {
     "@babel/polyfill": "^7.12.1",

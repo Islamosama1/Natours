@@ -56,6 +56,6 @@
   "keywords": [],
   "description": "",
   "engines": {
-    "node": "^10"
+    "node": ">=10.0.0"
   }
 }

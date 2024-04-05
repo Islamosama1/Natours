@@ -127,7 +127,7 @@ app.use('/api', limiter);
 //accept data in stream not in json
 app.post(
   '/webhook-checkout',
-  express.raw({ type: '*/*' }),
+  express.raw({ type: 'application/json' }),
   bookingController.webhookCheckout,
 );
 

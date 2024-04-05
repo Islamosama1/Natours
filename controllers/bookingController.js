@@ -1,5 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Tour = require('./../models/tourModel');
+const User = require('./../models/userModel');
 const Booking = require('./../models/bookingModel');
 const catchAsync = require('./../utils/catchAsync');
 const factory = require('./handlerFactory');
@@ -28,7 +29,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
           product_data: {
             name: `${tour.name} Tour`,
             description: tour.summary,
-            images: [`https://www.natours.dev/img/tours/${tour.imageCover}`],
+            images: [`/img/tours/${tour.imageCover}`],
           },
         },
         quantity: 1,
@@ -41,17 +42,6 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     session,
   });
 });
-
-// exports.createBookingCheckout = catchAsync(async (req, res, next) => {
-//   // This is only TEMPORARY, because it's UNSECURE: everyone can make bookings without paying
-//   const { tour, user, price } = req.query;
-
-//   if (!tour && !user && !price) return next();
-
-//   await Booking.create({ tour, user, price });
-
-//   res.redirect(req.originalUrl.split('?')[0]);
-// });
 
 exports.webhookCheckout = catchAsync(async (req, res, next) => {
   const signature = req.headers['stripe-signature'];
@@ -71,12 +61,20 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
 
-    await Booking.create({
-      tour: session.client_reference_id,
-      user: session.customer,
-      price: session.amount_total / 100,
-      stripeId: session.id,
-    });
+    try {
+      await Booking.create({
+        tour: session.client_reference_id,
+        user: session.customer,
+        price: session.amount_total / 100,
+        stripeId: session.id,
+      });
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Failed to create booking',
+      });
+    }
   }
 
   res.status(200).json({ received: true });
@@ -87,3 +85,14 @@ exports.getAllBookings = factory.getAll(Booking);
 exports.deleteBooking = factory.deleteOne(Booking);
 exports.getBooking = factory.getOne(Booking);
 exports.updateBooking = factory.updateOne(Booking);
+
+// exports.createBookingCheckout = catchAsync(async (req, res, next) => {
+//   // This is only TEMPORARY, because it's UNSECURE: everyone can make bookings without paying
+//   const { tour, user, price } = req.query;
+
+//   if (!tour && !user && !price) return next();
+
+//   await Booking.create({ tour, user, price });
+
+//   res.redirect(req.originalUrl.split('?')[0]);
+// });

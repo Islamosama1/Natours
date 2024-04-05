@@ -15,4 +15,15 @@
 
 
 
-- 📃How to create an API
+## Features
+
++ [x]  Signup and create your own account! 
++ [ ]  Login to your account! 
++ [ ]  Each login session is persisted using cookies
++ [ ]  Reset your password
++ [ ]  Update your password and profile
++ [ ]  Stripe payment checkout gateway 💸
++ [ ]  Upload Profile Picture 
++ [ ]  Email service 📨
++ [x]  Responsive for  Mobiles, Laptops and PC 📱
+

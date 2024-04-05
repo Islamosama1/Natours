@@ -24,14 +24,20 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
-// 1)TODO: Global Middleware
+app.use((req, res, next) => {
+  if (req.originalUrl === '/webhooks') {
+    next();
+  } else {
+    express.json()(req, res, next);
+  }
+});
+
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cors());
 
-//Serving static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-//set security HTTP headers
-// app.use(helmet());
 const scriptSrcUrls = [
   'https://api.tiles.mapbox.com/',
   'https://api.mapbox.com/',
@@ -111,27 +117,25 @@ app.use(
       objectSrc: [],
       imgSrc: [...imgSrcUrls],
       fontSrc: ["'self'", ...fontSrcUrls],
-      frameSrc: ["'self'", 'https://js.stripe.com/'], // Add this line to allow framing from js.stripe.com
+      frameSrc: ["'self'", 'https://js.stripe.com/'],
     },
   }),
 );
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout,
+);
 
 app.use(compression());
+//accept data in stream not in json
 
-//limit requests from same API
 const limiter = rateLimit({
   max: 100, //allow 1 handred request from the same ip per 1 hour
   windowMs: 60 * 60 * 1000,
   message: 'Too many requests from this IP, please try again in an hour',
 });
 app.use('/api', limiter);
-
-//accept data in stream not in json
-app.post(
-  '/webhook-checkout',
-  express.raw({ type: 'application/json' }),
-  bookingController.webhookCheckout,
-);
 
 // body parser  - reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));

@@ -34,7 +34,12 @@
 + [ ]  Responsive for  Mobiles, Laptops and PC 📱
 
 ## How To Use 🤔
-
+You can use this email to test: 
+```
+sophie@example.com      
+test1234
+```
+      
 ### Book a tour
 
 - Login to the site

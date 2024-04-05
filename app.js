@@ -24,16 +24,6 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use((req, res, next) => {
-  if (req.originalUrl === '/webhooks') {
-    next();
-  } else {
-    express.json()(req, res, next);
-  }
-});
-
-app.use(express.urlencoded({ extended: true }));
-
 app.use(cors());
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -121,11 +111,6 @@ app.use(
     },
   }),
 );
-app.post(
-  '/webhook-checkout',
-  express.raw({ type: 'application/json' }),
-  bookingController.webhookCheckout,
-);
 
 app.use(compression());
 //accept data in stream not in json
@@ -137,6 +122,11 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout,
+);
 // body parser  - reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());

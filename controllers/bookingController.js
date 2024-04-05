@@ -57,7 +57,7 @@ exports.webhookCheckout = (req, res, next) => {
   let event;
   try {
     event = stripe.webhooks.constructEvent(
-      JSON.stringify(req.body),
+      req.body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET,
     );
